@@ -24,7 +24,8 @@ public class DoubanOAuthController {
 
     private static String getLocalHost() throws UnknownHostException {
         //return InetAddress.getLocalHost().getHostAddress();
-        return "10.100.19.211";
+//        return "10.100.19.211";
+        return "127.0.0.1";
     }
 
     @RequestMapping("leadToAuthorize")
@@ -43,19 +44,19 @@ public class DoubanOAuthController {
         RestTemplate restTemplate = new RestTemplateBuilder().build();
 
         /**
-         * （D）客户端收到授权码，附上早先的"重定向URI"，向认证服务器申请令牌。这一步是在客户端的后台的服务器上完成的，对用户不可见。
+         * （D）客户端收到授权码code（这里是上面返回过来的），附上早先的"重定向URI"，向认证服务器申请令牌。这一步是在客户端的后台的服务器上完成的，对用户不可见。
          */
         String accessToken = restTemplate.getForObject("http://"+ getLocalHost() +":7000/getTokenByCode?" +
             "grant_type=authorization_code&" +
-            "code=xxx&" +
+            "code=xxx&" +//这里的code要带上，去获取Token
             "redirect_uri=http://"+ getLocalHost() +":7001/index", String.class);
-
+        System.out.println(accessToken);
         /**
          * 发起通过token换用户信息的请求
          */
         String username = restTemplate.getForObject("http://"+ getLocalHost() +":7000/getUserinfoByToken?" +
-            "access_token=yyy", String.class);
-
+            "access_token="+accessToken, String.class);
+        System.out.println(username);
         request.getSession().setAttribute("username",username);
 
         return "index";
@@ -66,7 +67,7 @@ public class DoubanOAuthController {
     @ResponseBody
     public String getUserInfo(HttpServletRequest request) throws Exception {
         Object username = request.getSession().getAttribute("username");
-        return "Tom 18811311416";
+        return username+"Tom 18811311416";
     }
 
 }

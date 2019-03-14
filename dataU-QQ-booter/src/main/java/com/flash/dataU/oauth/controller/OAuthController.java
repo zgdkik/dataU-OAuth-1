@@ -3,6 +3,7 @@ package com.flash.dataU.oauth.controller;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,8 @@ public class OAuthController {
 
     private static String getLocalHost() throws UnknownHostException {
         //return InetAddress.getLocalHost().getHostAddress();
-        return "10.100.19.211";
+        //return "10.100.19.211";
+        return "127.0.0.1";
     }
 
     private static String getRedirect_uri() throws UnknownHostException {
@@ -43,6 +45,9 @@ public class OAuthController {
     @RequestMapping("login")
     public void login(String username, String password, HttpServletResponse response) throws IOException {
         // 验证用户名密码是否正确
+        System.out.println("username-验证：ok"+username);
+        System.out.println("password-验证：ok"+password);
+        //这里是验证通过之后的重定向
         response.sendRedirect(getRedirect_uri() + "?code=xxx&state=hehe");
     }
 
@@ -54,10 +59,11 @@ public class OAuthController {
     public String getTokenByCode(String grant_type, String code, String client_id, String redirect_uri) throws IOException {
         // 判断client_id、redirect_uri、code是否正确
         // 返回token
-        return "{access_token:yyy," +
-            "token_type:bearer," +
-            "expires_in:600," +
-            "refresh_token:zzz}";
+        return "thisIsAccessToken";
+//        return "{access_token:yyy," +
+//            "token_type:bearer," +
+//            "expires_in:600," +
+//            "refresh_token:zzz}";
     }
 
     /**
@@ -65,8 +71,16 @@ public class OAuthController {
      */
     @RequestMapping("getUserinfoByToken")
     @ResponseBody
-    public String getUserinfoByToken(String token) throws IOException {
+    public String getUserinfoByToken(String token, HttpServletRequest request) throws IOException {
+        System.out.println("------->"+request.getQueryString());
+        if("access_token=thisIsAccessToken".equals(request.getQueryString())){
+            System.out.println("token校验成功，接下来组织返回用户信息");
+            return "{userGuid:j3jlk2jj32li43i," +
+                    "username:Syao," +
+                    "mobile:18818885858}";
+        }
         // 判断token是否正确
+        System.out.println("token ="+token);
         return "{userGuid:j3jlk2jj32li43i," +
             "username:Tom," +
             "mobile:18811412324}";

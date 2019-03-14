@@ -21,6 +21,10 @@ public class Application {
         SpringApplication.run(Application.class,args);
     }
 
+    /**
+     * @return
+     * request: http://127.0.0.1:7001/login
+     */
     @RequestMapping("/login")
     public String login(){
         return "login";
